@@ -199,15 +199,9 @@ where
         block_id: BlockId,
         opts: GethDebugTracingOptions,
     ) -> Result<Vec<TraceResult>, Eth::Error> {
-        let block_hash = self
-            .provider()
-            .block_hash_for_id(block_id)
-            .map_err(Eth::Error::from_eth_err)?
-            .ok_or(EthApiError::HeaderNotFound(block_id))?;
-
         let block = self
             .eth_api()
-            .recovered_block(block_hash.into())
+            .recovered_block(block_id)
             .await?
             .ok_or(EthApiError::HeaderNotFound(block_id))?;
         let evm_env = self.eth_api().evm_env_for_header(block.sealed_block().sealed_header())?;
