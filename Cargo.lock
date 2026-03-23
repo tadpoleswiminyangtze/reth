@@ -8749,6 +8749,7 @@ dependencies = [
  "alloy-eips",
  "alloy-evm",
  "alloy-primitives",
+ "alloy-rlp",
  "arbitrary",
  "bincode",
  "derive_more",
@@ -9516,7 +9517,6 @@ dependencies = [
  "alloy-trie",
  "arbitrary",
  "auto_impl",
- "bincode",
  "byteorder",
  "bytes",
  "dashmap",
@@ -9538,7 +9538,6 @@ dependencies = [
  "secp256k1 0.30.0",
  "serde",
  "serde_json",
- "serde_with",
  "thiserror 2.0.18",
 ]
 
