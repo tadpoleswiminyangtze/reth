@@ -19,6 +19,7 @@ reth-chain-state.workspace = true
 reth-payload-builder-primitives.workspace = true
 reth-payload-primitives.workspace = true
 reth-ethereum-engine-primitives.workspace = true
+reth-trie-parallel.workspace = true
 
 # alloy
 alloy-consensus.workspace = true
@@ -47,4 +48,5 @@ test-utils = [
     "reth-primitives-traits/test-utils",
     "tokio/rt",
     "reth-execution-cache/test-utils",
+    "reth-trie-parallel/test-utils",
 ]

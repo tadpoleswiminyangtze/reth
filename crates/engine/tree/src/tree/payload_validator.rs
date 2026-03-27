@@ -41,9 +41,9 @@
 use crate::tree::{
     error::{InsertBlockError, InsertBlockErrorKind, InsertPayloadError},
     instrumented_state::{InstrumentedStateProvider, StateProviderStats},
+    multiproof::{StateRootComputeOutcome, StateRootHandle},
     payload_processor::PayloadProcessor,
     precompile_cache::{CachedPrecompile, CachedPrecompileMetrics, PrecompileCacheMap},
-    sparse_trie::StateRootComputeOutcome,
     CacheWaitDurations, CachedStateProvider, EngineApiMetrics, EngineApiTreeState, ExecutionEnv,
     PayloadHandle, StateProviderBuilder, StateProviderDatabase, TreeConfig, WaitForCaches,
 };
@@ -1944,6 +1944,14 @@ pub trait EngineValidator<
 
     /// Returns [`SavedCache`] for the given block hash.
     fn cache_for(&self, _block_hash: B256) -> Option<SavedCache>;
+
+    /// Spawns a sparse trie pipeline and returns a handle for the payload builder.
+    fn sparse_trie_handle_for(
+        &self,
+        parent_hash: B256,
+        parent_state_root: B256,
+        state: &EngineApiTreeState<N>,
+    ) -> Option<StateRootHandle>;
 }
 
 impl<N, Types, P, Evm, V> EngineValidator<Types> for BasicEngineValidator<P, Evm, V>
@@ -2010,6 +2018,27 @@ where
 
     fn cache_for(&self, block_hash: B256) -> Option<SavedCache> {
         Some(self.payload_processor.cache_for(block_hash))
+    }
+
+    fn sparse_trie_handle_for(
+        &self,
+        parent_hash: B256,
+        parent_state_root: B256,
+        state: &EngineApiTreeState<N>,
+    ) -> Option<StateRootHandle> {
+        let (lazy_overlay, anchor_hash) = Self::get_parent_lazy_overlay(parent_hash, state);
+        let overlay_factory =
+            OverlayStateProviderFactory::new(self.provider.clone(), self.changeset_cache.clone())
+                .with_block_hash(Some(anchor_hash))
+                .with_lazy_overlay(lazy_overlay);
+
+        Some(self.payload_processor.spawn_state_root(
+            overlay_factory,
+            parent_state_root,
+            // Full proof workers — tx count unknown at FCU time (block built incrementally)
+            false,
+            &self.config,
+        ))
     }
 }
 
