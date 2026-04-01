@@ -92,7 +92,6 @@ impl Command {
             block_provider,
             auth_provider,
             next_block,
-            is_optimism,
             use_reth_namespace,
             rlp_blocks,
             wait_for_persistence,
@@ -201,7 +200,6 @@ impl Command {
 
             let (version, params) = block_to_new_payload(
                 block,
-                is_optimism,
                 rlp,
                 use_reth_namespace,
                 wait_for_persistence,
