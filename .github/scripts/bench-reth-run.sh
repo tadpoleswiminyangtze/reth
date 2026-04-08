@@ -77,7 +77,7 @@ cleanup() {
   sudo chown -R "$(id -un):$(id -gn)" "$OUTPUT_DIR" 2>/dev/null || true
   # Let schelk recover the mounted volume in place so dm-era can restore only
   # the changed blocks and clean up its own state.
-  mountpoint -q "$SCHELK_MOUNT" && sudo schelk recover -y --kill || true
+  sudo schelk recover -y --kill || true
 }
 TAIL_PID=
 TRACY_PID=
